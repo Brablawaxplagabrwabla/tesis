@@ -22,6 +22,8 @@ public class UI extends javax.swing.JFrame {
     
     private JLabel etiquetaMapa;
     private MapRender render;
+    private boolean zoomingH = false;
+    private boolean zoomingV = false;
     
     public UI() {
         initComponents();
@@ -49,7 +51,6 @@ public class UI extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(1200, 720));
 
         mapa.setName(""); // NOI18N
-        mapa.setPreferredSize(new java.awt.Dimension(768, 512));
 
         javax.swing.GroupLayout mapaLayout = new javax.swing.GroupLayout(mapa);
         mapa.setLayout(mapaLayout);
@@ -128,21 +129,33 @@ public class UI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void sliderHStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderHStateChanged
-        int valor = sliderH.getValue();
-        render.setX(valor);
-        actualizarMapa();
+        if (zoomingH) {
+            sliderH.setValue(render.getX());
+            zoomingH = false;
+        } else {
+            int valor = sliderH.getValue();
+            render.setX(valor);
+            actualizarMapa();
+        }
     }//GEN-LAST:event_sliderHStateChanged
 
     private void sliderVStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderVStateChanged
-        int valor = sliderV.getValue();
-        render.setY(valor);
-        actualizarMapa();
+        if (zoomingV) {
+            sliderV.setValue(render.getY());
+            zoomingV = false;
+        } else {
+            int valor = sliderV.getValue();
+            render.setY(valor);
+            actualizarMapa();
+        }
     }//GEN-LAST:event_sliderVStateChanged
 
     private void btnZoomInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZoomInActionPerformed
         if (render.getZoom() < render.getMetadata().getMaxZoom()) {
             render.aumentarZoom();
             actualizarMapa();
+            zoomingV = true;
+            zoomingH = true;
             actualizarSliders();
         }
     }//GEN-LAST:event_btnZoomInActionPerformed
@@ -151,6 +164,8 @@ public class UI extends javax.swing.JFrame {
         if (render.getZoom() > render.getMetadata().getMinZoom()) {
             render.disminuirZoom();
             actualizarMapa();
+            zoomingV = true;
+            zoomingH = true;
             actualizarSliders();
         }
     }//GEN-LAST:event_btnZoomOutActionPerformed

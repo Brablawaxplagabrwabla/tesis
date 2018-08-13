@@ -84,19 +84,42 @@ public class MapRender {
     }
 
     public void aumentarZoom() {
-        double proporcionX = (double) this.x / (double) this.metadata.getDato(zoom, "numX");
-        double proporcionY = (double) this.y / (double) this.metadata.getDato(zoom, "numY");
+        double factorX = (double) metadata.getDato(zoom + 1, "numX") / (double) metadata.getDato(zoom, "numX");
+        double factorY = (double) metadata.getDato(zoom + 1, "numY") / (double) metadata.getDato(zoom, "numY");
+        
+        double indiceX = (double) this.x + 1.5;
+        double indiceY = (double) this.y + 0.5;
+
+        int nuevoX = (int) Math.ceil(factorX * indiceX - 1);
+        int nuevoY = (int) Math.ceil(factorY * indiceY - 1);
+        
+        this.x = nuevoX;
+        this.y = nuevoY;
         this.zoom++;
-        this.x = (int) Math.ceil(proporcionX * this.metadata.getDato(zoom, "numX"));
-        this.y = (int) Math.ceil(proporcionY * this.metadata.getDato(zoom, "numY"));
     }
     
     public void disminuirZoom() {
-        double proporcionX = (double) this.x / (double) this.metadata.getDato(zoom, "numX");
-        double proporcionY = (double) this.y / (double) this.metadata.getDato(zoom, "numY");
+        double factorX = (double) metadata.getDato(zoom - 1, "numX") / (double) metadata.getDato(zoom, "numX");
+        double factorY = (double) metadata.getDato(zoom - 1, "numY") / (double) metadata.getDato(zoom, "numY");
+        
+        double indiceX = (double) this.x + 1;
+        double indiceY = (double) this.y + 0.5;
+        
+        int nuevoX = (int) Math.ceil(factorX * indiceX - 1.5);
+        int nuevoY = (int) Math.ceil(factorY * indiceY - 1);
+        
+        this.x = nuevoX;
+        this.y = nuevoY;
+
         this.zoom--;
-        this.x = (int) Math.floor(proporcionX * this.metadata.getDato(zoom, "numX"));
-        this.y = (int) Math.floor(proporcionY * this.metadata.getDato(zoom, "numY"));
+        
+        while (this.x + NUM_X > metadata.getDato(zoom, "numX")) {
+            this.x--;
+        }
+        
+        while (this.y + NUM_Y > metadata.getDato(zoom, "numY")) {
+            this.y--;
+        }        
     }
 
     public void setX(int x) {
