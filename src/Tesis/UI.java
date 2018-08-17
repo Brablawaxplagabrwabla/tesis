@@ -10,7 +10,12 @@ package Tesis;
  * @author gtroncone
  */
 
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.util.LinkedList;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -22,9 +27,16 @@ public class UI extends javax.swing.JFrame {
     
     private JLabel etiquetaMapa;
     private MapRender render;
+    private Simulacion simulacion;
+    
     private boolean zoomingH = false;
     private boolean zoomingV = false;
+    private boolean drawingP = false;
+    private boolean drawingR = false;
+    private boolean firstPointSet = false;
     
+    private LinkedList<Point> puntos;
+        
     public UI() {
         initComponents();
     }
@@ -39,10 +51,26 @@ public class UI extends javax.swing.JFrame {
     private void initComponents() {
 
         mapa = new javax.swing.JPanel();
-        sliderV = new javax.swing.JSlider();
-        sliderH = new javax.swing.JSlider();
         btnZoomIn = new javax.swing.JButton();
         btnZoomOut = new javax.swing.JButton();
+        menuP = new javax.swing.JTabbedPane();
+        panelCenAcum = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lstCenAcum = new javax.swing.JList<>();
+        btnNuevoCenAcum = new javax.swing.JButton();
+        btnEliminarCenAcum = new javax.swing.JButton();
+        panelRutas = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        lstRutas = new javax.swing.JList<>();
+        btnNuevaRuta = new javax.swing.JButton();
+        btnEliminarRuta = new javax.swing.JButton();
+        panelCamiones = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        lstCamiones = new javax.swing.JList<>();
+        btnNuevoCamion = new javax.swing.JButton();
+        btnEliminarCamion = new javax.swing.JButton();
+        sliderV = new javax.swing.JSlider();
+        sliderH = new javax.swing.JSlider();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tesis");
@@ -51,30 +79,14 @@ public class UI extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(1200, 720));
 
         mapa.setName(""); // NOI18N
-
-        javax.swing.GroupLayout mapaLayout = new javax.swing.GroupLayout(mapa);
-        mapa.setLayout(mapaLayout);
-        mapaLayout.setHorizontalGroup(
-            mapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 768, Short.MAX_VALUE)
-        );
-        mapaLayout.setVerticalGroup(
-            mapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 512, Short.MAX_VALUE)
-        );
-
-        sliderV.setOrientation(javax.swing.JSlider.VERTICAL);
-        sliderV.setPaintLabels(true);
-        sliderV.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                sliderVStateChanged(evt);
+        mapa.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                mapaMouseMoved(evt);
             }
         });
-
-        sliderH.setPaintLabels(true);
-        sliderH.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                sliderHStateChanged(evt);
+        mapa.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                mapaMouseClicked(evt);
             }
         });
 
@@ -92,6 +104,164 @@ public class UI extends javax.swing.JFrame {
             }
         });
 
+        javax.swing.GroupLayout mapaLayout = new javax.swing.GroupLayout(mapa);
+        mapa.setLayout(mapaLayout);
+        mapaLayout.setHorizontalGroup(
+            mapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mapaLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(mapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnZoomIn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+        mapaLayout.setVerticalGroup(
+            mapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mapaLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        panelCenAcum.setBackground(new java.awt.Color(168, 168, 168));
+
+        jScrollPane1.setViewportView(lstCenAcum);
+
+        btnNuevoCenAcum.setText("Añadir");
+        btnNuevoCenAcum.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoCenAcumActionPerformed(evt);
+            }
+        });
+
+        btnEliminarCenAcum.setText("Eliminar");
+
+        javax.swing.GroupLayout panelCenAcumLayout = new javax.swing.GroupLayout(panelCenAcum);
+        panelCenAcum.setLayout(panelCenAcumLayout);
+        panelCenAcumLayout.setHorizontalGroup(
+            panelCenAcumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCenAcumLayout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(btnNuevoCenAcum, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEliminarCenAcum, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35))
+            .addGroup(panelCenAcumLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelCenAcumLayout.setVerticalGroup(
+            panelCenAcumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCenAcumLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelCenAcumLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnEliminarCenAcum, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                    .addComponent(btnNuevoCenAcum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        menuP.addTab("Centros de Acumulación", panelCenAcum);
+
+        jScrollPane3.setViewportView(lstRutas);
+
+        btnNuevaRuta.setText("Añadir");
+        btnNuevaRuta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevaRutaActionPerformed(evt);
+            }
+        });
+
+        btnEliminarRuta.setText("Eliminar");
+
+        javax.swing.GroupLayout panelRutasLayout = new javax.swing.GroupLayout(panelRutas);
+        panelRutas.setLayout(panelRutasLayout);
+        panelRutasLayout.setHorizontalGroup(
+            panelRutasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRutasLayout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(btnNuevaRuta, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEliminarRuta, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35))
+            .addGroup(panelRutasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelRutasLayout.setVerticalGroup(
+            panelRutasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRutasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelRutasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnEliminarRuta, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                    .addComponent(btnNuevaRuta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        menuP.addTab("Rutas", panelRutas);
+
+        jScrollPane4.setViewportView(lstCamiones);
+
+        btnNuevoCamion.setText("Añadir");
+        btnNuevoCamion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoCamionActionPerformed(evt);
+            }
+        });
+
+        btnEliminarCamion.setText("Eliminar");
+
+        javax.swing.GroupLayout panelCamionesLayout = new javax.swing.GroupLayout(panelCamiones);
+        panelCamiones.setLayout(panelCamionesLayout);
+        panelCamionesLayout.setHorizontalGroup(
+            panelCamionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCamionesLayout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(btnNuevoCamion, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEliminarCamion, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35))
+            .addGroup(panelCamionesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelCamionesLayout.setVerticalGroup(
+            panelCamionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCamionesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 399, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelCamionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnEliminarCamion, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                    .addComponent(btnNuevoCamion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        menuP.addTab("Camiones", panelCamiones);
+
+        sliderV.setOrientation(javax.swing.JSlider.VERTICAL);
+        sliderV.setPaintLabels(true);
+        sliderV.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sliderVStateChanged(evt);
+            }
+        });
+
+        sliderH.setPaintLabels(true);
+        sliderH.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sliderHStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -99,30 +269,29 @@ public class UI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(sliderH, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(mapa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(sliderH, javax.swing.GroupLayout.DEFAULT_SIZE, 768, Short.MAX_VALUE)
+                    .addComponent(mapa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(sliderV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnZoomIn, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                    .addComponent(btnZoomOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(508, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(menuP, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(sliderV, javax.swing.GroupLayout.PREFERRED_SIZE, 512, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(mapa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(13, 13, 13)
-                .addComponent(sliderH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(77, 77, 77)
-                .addComponent(btnZoomIn, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnZoomOut, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(menuP)
+                        .addContainerGap(146, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(sliderV, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
+                            .addComponent(mapa, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(sliderH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         pack();
@@ -170,6 +339,67 @@ public class UI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnZoomOutActionPerformed
 
+    private void mapaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mapaMouseClicked
+        if (drawingP) {
+            if (puntos == null) {
+                puntos = new LinkedList();
+                puntos.add(new Point(evt.getX(), evt.getY()));
+                firstPointSet = true;
+            } else {
+                puntos.add(new Point(evt.getX(), evt.getY()));
+                render.añadirLineaDeCarga(puntos.get(puntos.size() - 2), puntos.getLast());
+                if (puntos.size() > 2 && puntos.getFirst().distance(puntos.getLast()) < 15) {
+                    firstPointSet = false;
+                    drawingP = false;
+                    añadirCentroDeAcumulacion();
+                    finalizarCreacionCentro();
+                    return;
+                }
+            }
+            etiquetaMapa.setIcon(new ImageIcon(render.renderizarPunto(puntos.getLast(), true)));
+        } else if (drawingR) {
+            Point centroid = render.getCentroid(new Point(evt.getX(), evt.getY()));
+            if (centroid != null) {
+                if (puntos == null) {
+                    puntos = new LinkedList();
+                    puntos.add(centroid);
+                    firstPointSet = true;
+                } else {
+                    if (centroid.getX() != puntos.getFirst().getX() || centroid.getY() != puntos.getFirst().getY()) {
+                        // añadir nueva linea, crear ruta y resetear contexto
+                    }
+                }
+                etiquetaMapa.setIcon(new ImageIcon(render.renderizarPunto(puntos.getLast(), true)));
+            }
+        }
+    }//GEN-LAST:event_mapaMouseClicked
+
+    private void btnNuevoCenAcumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoCenAcumActionPerformed
+        drawingP = true;
+        /*Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Image cursor = toolkit.getImage("iconoLapiz.png");
+        Cursor a = toolkit.createCustomCursor(cursor, new Point(mapa.getX(), mapa.getY()), "");
+        mapa.setCursor(a);*/
+        //cambiarCursorADibujo();
+        //setCursor(Cursor.getDefaultCursor());
+    }//GEN-LAST:event_btnNuevoCenAcumActionPerformed
+
+    private void mapaMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mapaMouseMoved
+        if (firstPointSet) {
+            if (drawingP || drawingR) {
+                etiquetaMapa.setIcon(new ImageIcon(render.renderizarLineaCarga(puntos.getLast(), new Point(evt.getX(), evt.getY()), true)));                
+            }
+        }
+    }//GEN-LAST:event_mapaMouseMoved
+
+    private void btnNuevaRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaRutaActionPerformed
+        drawingR = true;
+    }//GEN-LAST:event_btnNuevaRutaActionPerformed
+
+    private void btnNuevoCamionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoCamionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNuevoCamionActionPerformed
+
     /**        this.dibujar(tiles.getRender(12, valor, 0));
      * @param args the command line arguments
      */
@@ -202,17 +432,30 @@ public class UI extends javax.swing.JFrame {
             public void run() {
                 UI tesis = new UI();
                 tesis.setVisible(true);
-                tesis.inicializar();
+                try {
+                    tesis.inicializar();                    
+                } catch (NullPointerException e) {
+                    System.out.println("Ejecución terminada forzosamente");
+                    System.exit(1);
+                }
             }
         });
     }
     
-    public void inicializar() {
-        MapRender tiles = new MapRender();
+    public void inicializar() throws NullPointerException {
+        MapRender tiles = null;
+        try {
+            tiles = new MapRender();            
+        } catch (NullPointerException e) {
+            System.out.println("Error encontrado de los metadatos, verifique que las tejas del mapa sean capaces de formar un quadtree.");
+            throw e;
+        }
         render = tiles;
         JLabel etiqueta = new JLabel(new ImageIcon(tiles.getRender()), JLabel.CENTER);
         etiquetaMapa = etiqueta;
         mapa.add(etiqueta);
+        simulacion = new Simulacion();
+        render.setPoligonos(simulacion.getCentrosDeAcum());
         sliderH.setValue(0);
         sliderV.setValue(0);
         sliderH.setMaximum(render.getMetadata().getDato(render.getZoom(), "numX") - render.getNUM_X());
@@ -220,6 +463,27 @@ public class UI extends javax.swing.JFrame {
         sliderV.setMaximum(render.getMetadata().getDato(render.getZoom(), "numY") - render.getNUM_Y()); 
         etiqueta.setSize(new Dimension(render.getNUM_X() * render.getMetadata().getDimX(), 
                 render.getNUM_Y() * render.getMetadata().getDimY()));
+    }
+    
+    private void añadirCentroDeAcumulacion() {
+        int[] puntosX = new int[puntos.size() - 1];
+        int[] puntosY = new int[puntos.size() - 1];
+        for (int i = 0; i < puntos.size() - 1; i++) {
+            puntosX[i] = (int) Math.floor(puntos.get(i).getX());
+            puntosY[i] = (int) Math.floor(puntos.get(i).getY());
+            System.out.println(puntosX[i] + " " + puntosY[i]);
+        }
+        CentroDeAcumulacion centro = new CentroDeAcumulacion(puntosX, puntosY, render.getZoom(), render.getX(), render.getY());
+        simulacion.añadirCentro(centro);
+        render.añadirPoligono(centro);
+    }
+    
+    private void finalizarCreacionCentro() {
+        puntos = null;
+        render.finalizarGeneracionPoligono();
+        firstPointSet = false;
+        drawingP = false;
+        actualizarMapa();
     }
     
     public void actualizarMapa() {
@@ -232,9 +496,25 @@ public class UI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnEliminarCamion;
+    private javax.swing.JButton btnEliminarCenAcum;
+    private javax.swing.JButton btnEliminarRuta;
+    private javax.swing.JButton btnNuevaRuta;
+    private javax.swing.JButton btnNuevoCamion;
+    private javax.swing.JButton btnNuevoCenAcum;
     private javax.swing.JButton btnZoomIn;
     private javax.swing.JButton btnZoomOut;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JList<String> lstCamiones;
+    private javax.swing.JList<String> lstCenAcum;
+    private javax.swing.JList<String> lstRutas;
     private javax.swing.JPanel mapa;
+    private javax.swing.JTabbedPane menuP;
+    private javax.swing.JPanel panelCamiones;
+    private javax.swing.JPanel panelCenAcum;
+    private javax.swing.JPanel panelRutas;
     private javax.swing.JSlider sliderH;
     private javax.swing.JSlider sliderV;
     // End of variables declaration//GEN-END:variables

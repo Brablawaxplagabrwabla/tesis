@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @author gtroncone
  */
-public class Metadata {
+public class MapMetadata {
     
     private final ArrayList<int[]> zooms;
     private final int maxZoom;
@@ -19,7 +19,7 @@ public class Metadata {
     private final int dimX;
     private final int dimY;
     
-    public Metadata() {
+    public MapMetadata() throws NullPointerException {
         maxZoom = 18;
         minZoom = 12;
         dimX = 256;
@@ -42,45 +42,64 @@ public class Metadata {
         
         zoom12[0] = 1332;
         zoom12[1] = 1952;
-        zoom12[2] = 4;
-        zoom12[3] = 3;
+        zoom12[2] = 5;
+        zoom12[3] = 4;
         zooms.add(zoom12);
         
-        zoom13[0] = 2665;
-        zoom13[1] = 3905;
-        zoom13[2] = 7;
-        zoom13[3] = 4;
+        zoom13[0] = 2664;
+        zoom13[1] = 3904;
+        zoom13[2] = 10;
+        zoom13[3] = 8;
         zooms.add(zoom13);
         
-        zoom14[0] = 5330;
-        zoom14[1] = 7810;
-        zoom14[2] = 14;
-        zoom14[3] = 8;
+        zoom14[0] = 5328;
+        zoom14[1] = 7808;
+        zoom14[2] = 20;
+        zoom14[3] = 16;
         zooms.add(zoom14);
         
-        zoom15[0] = 10661;
-        zoom15[1] = 15620;
-        zoom15[2] = 26;
-        zoom15[3] = 15;
+        zoom15[0] = 10656;
+        zoom15[1] = 15616;
+        zoom15[2] = 40;
+        zoom15[3] = 32;
         zooms.add(zoom15);
         
-        zoom16[0] = 21323;
-        zoom16[1] = 31240;
-        zoom16[2] = 51;
-        zoom16[3] = 30;
+        zoom16[0] = 21312;
+        zoom16[1] = 31232;
+        zoom16[2] = 80;
+        zoom16[3] = 64;
         zooms.add(zoom16);
         
-        zoom17[0] = 42646;
-        zoom17[1] = 62480;
-        zoom17[2] = 102;
-        zoom17[3] = 59;
+        zoom17[0] = 42624;
+        zoom17[1] = 62464;
+        zoom17[2] = 160;
+        zoom17[3] = 128;
         zooms.add(zoom17);
         
-        zoom18[0] = 85293;
-        zoom18[1] = 124960;
-        zoom18[2] = 203;
-        zoom18[3] = 117;
+        zoom18[0] = 85248;
+        zoom18[1] = 124928;
+        zoom18[2] = 320;
+        zoom18[3] = 256;
         zooms.add(zoom18);
+        
+        if (!verificacionDeMetadatos()) {
+            throw new NullPointerException();
+        }
+    }
+    
+    private boolean verificacionDeMetadatos() {
+        if (maxZoom < minZoom || dimX != dimY) {
+            return false;
+        } else {
+            for (int i = 0; i < zooms.size() - 1; i++) {
+                for (int j = 0; j < zooms.get(0).length; j++) {
+                    if (2 * zooms.get(i)[j] != zooms.get(i + 1)[j]) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public int getMaxZoom() {
